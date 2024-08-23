@@ -11,6 +11,7 @@ TagManager:
   - 
   - Water
   - UI
+  - Player
   - 
   - 
   - 
@@ -34,8 +35,7 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
+  - Room
   - 
   m_SortingLayers:
   - name: Default
