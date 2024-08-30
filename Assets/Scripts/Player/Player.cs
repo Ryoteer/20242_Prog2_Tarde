@@ -5,10 +5,17 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Player : MonoBehaviour
 {
-    [Header("<color=green>Inputs</color>")]
+    [Header("<color=#6A89A7>Animation</color>")]
+    [SerializeField] private string _atkName = "onAttack";
+    [SerializeField] private string _isMovName = "isMoving";
+    [SerializeField] private string _xName = "xAxis";
+    [SerializeField] private string _zName = "zAxis";
+
+    [Header("<color=#6A89A7>Inputs</color>")]
+    [SerializeField] private KeyCode _atkKey = KeyCode.Mouse0;
     [SerializeField] private KeyCode _jumpKey = KeyCode.Space;
 
-    [Header("<color=green>Physics</color>")]
+    [Header("<color=#6A89A7>Physics</color>")]
     [SerializeField] private float _jumpForce = 5.0f;
     [SerializeField] private float _movSpeed = 3.5f;
 
@@ -16,6 +23,7 @@ public class Player : MonoBehaviour
     private float _xAxis = 0f, _zAxis = 0f;
     private Vector3 _dir = new();
 
+    private Animator _anim;
     private Rigidbody _rb;
 
     private void Awake()
@@ -27,10 +35,25 @@ public class Player : MonoBehaviour
         //_rb.angularDrag = 1f;
     }
 
+    private void Start()
+    {
+        _anim = GetComponentInChildren<Animator>();
+    }
+
     private void Update()
     {
         _xAxis = Input.GetAxis("Horizontal");
         _zAxis = Input.GetAxis("Vertical");
+
+        _anim.SetFloat(_xName, _xAxis);
+        _anim.SetFloat(_zName, _zAxis);
+
+        _anim.SetBool(_isMovName, _xAxis != 0 || _zAxis != 0);
+
+        if (Input.GetKeyDown(_atkKey))
+        {
+            _anim.SetTrigger(_atkName);
+        }
 
         if (Input.GetKeyDown(_jumpKey) && !_isOnAir)
         {
@@ -60,6 +83,11 @@ public class Player : MonoBehaviour
         //_rb.AddForce(transform.position + _dir * _movSpeed, ForceMode.Force);
 
         _rb.MovePosition(transform.position + _dir * _movSpeed * Time.fixedDeltaTime);
+    }
+
+    public void Attack()
+    {
+        Debug.Log($"<color=#6A89A7>{name}</color>: Japish.");
     }
 
     private void OnCollisionEnter(Collision collision)
