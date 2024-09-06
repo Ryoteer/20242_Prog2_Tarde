@@ -33,6 +33,8 @@ public class Player : MonoBehaviour
 
         //_rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         //_rb.angularDrag = 1f;
+
+        GameManager.Instance.Player = this;
     }
 
     private void Start()
