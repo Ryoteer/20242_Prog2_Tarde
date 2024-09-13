@@ -15,4 +15,14 @@ public class PlayerAvatar : MonoBehaviour
     {
         _parent.Attack();
     }
+
+    public void MultiAttack()
+    {
+        _parent.MultiAttack();
+    }
+
+    public void Cast()
+    {
+        _parent.Cast();
+    }
 }

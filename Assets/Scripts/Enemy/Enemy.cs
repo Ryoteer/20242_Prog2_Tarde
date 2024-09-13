@@ -11,6 +11,10 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float _atkDist = 2.0f;
     [SerializeField] private float _changeNodeDist = 0.5f;
 
+    [Header("<color=red>Behaviours</color>")]
+    [SerializeField] private int _maxHP = 100;
+
+    private int _actualHP;
     private Transform _target, _actualNode;
     private List<Transform> _navMeshNodes = new();
     public List<Transform> NavMeshNodes 
@@ -21,15 +25,22 @@ public class Enemy : MonoBehaviour
 
     private NavMeshAgent _agent;
 
+    private void Awake()
+    {
+        _actualHP = _maxHP;
+    }
+
     private void Start()
     {
         _agent = GetComponent<NavMeshAgent>();
-        _target = GameManager.Instance.Player.gameObject.transform;
+        
         GameManager.Instance.Enemies.Add(this);
     }
 
     public void Initialize()
     {
+        _target = GameManager.Instance.Player.gameObject.transform;
+
         _actualNode = GetNewNode();
 
         _agent.SetDestination(_actualNode.position);
@@ -49,7 +60,7 @@ public class Enemy : MonoBehaviour
             {
                 if (!_agent.isStopped) _agent.isStopped = true;
 
-                Debug.Log($"<color=red>{name}</color>: Japish.");
+                //Debug.Log($"<color=red>{name}</color>: Japish.");
             }
             else
             {
@@ -81,5 +92,23 @@ public class Enemy : MonoBehaviour
         }
 
         return newNode;
+    }
+
+    public void TakeDamage(int dmg)
+    {
+        _actualHP -= dmg;
+
+        if(_actualHP <= 0)
+        {
+            Debug.Log($"<color=red>{name}</color>: oh no *Explota*");
+
+            GameManager.Instance.Enemies.Remove(this);
+
+            Destroy(gameObject);
+        }
+        else
+        {
+            Debug.Log($"<color=red>{name}</color>: Comí <color=black>{dmg}</color> puntos de daño. Me quedan <color=green>{_actualHP}</color> puntos.");
+        }
     }
 }
