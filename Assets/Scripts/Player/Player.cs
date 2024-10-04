@@ -18,6 +18,11 @@ public class Player : MonoBehaviour
     [Header("<color=#6A89A7>Behaviours</color>")]
     [SerializeField] private int _atkDmg = 20;
 
+    [Header("<color=#6A89A7>Camera</color>")]
+    [SerializeField] private Transform _camTarget;
+
+    public Transform GetCamTarget { get { return _camTarget; } }
+
     [Header("<color=#6A89A7>Inputs</color>")]
     [SerializeField] private KeyCode _atkKey = KeyCode.Mouse0;
     [SerializeField] private KeyCode _multiAtkKey = KeyCode.Mouse1;
@@ -41,12 +46,12 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask _movMask;
     [SerializeField] private float _movSpeed = 3.5f;
 
-    private bool _isOnAir = false;
-    private float _xAxis = 0f, _zAxis = 0f;
-    private Vector3 _dir = new(), _jumpOffset = new(), _movRayDir = new();
+    private Vector3 _camForwardFix = new(), _camRightFix = new(), _dir = new(), _jumpOffset = new(), _movRayDir = new();
+    private Vector3 _dirFix = new();
 
     private Animator _anim;
     private Rigidbody _rb;
+    private Transform _camTransform;
 
     private Ray _atkRay, _intRay, _jumpRay, _movRay, _multiAtkRay;
     private RaycastHit _atkHit, _intHit;
@@ -57,25 +62,27 @@ public class Player : MonoBehaviour
         _rb.constraints = RigidbodyConstraints.FreezeRotation;
 
         //_rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-        //_rb.angularDrag = 1f;        
+        //_rb.angularDrag = 1f;
+
+        GameManager.Instance.Player = this;
     }
 
     private void Start()
     {
-        GameManager.Instance.Player = this;
+        _camTransform = Camera.main.transform;
 
         _anim = GetComponentInChildren<Animator>();
     }
 
     private void Update()
     {
-        _xAxis = Input.GetAxis("Horizontal");
-        _zAxis = Input.GetAxis("Vertical");
+        _dir.x = Input.GetAxis("Horizontal");
+        _dir.z = Input.GetAxis("Vertical");
 
-        if(!IsBlocked(_xAxis, _zAxis))
+        if(!IsBlocked(_dir.x, _dir.z))
         {
-            _anim.SetFloat(_xName, _xAxis);
-            _anim.SetFloat(_zName, _zAxis);
+            _anim.SetFloat(_xName, _dir.x);
+            _anim.SetFloat(_zName, _dir.z);
         }
         else
         {
@@ -85,7 +92,7 @@ public class Player : MonoBehaviour
         
         _anim.SetBool(_isGroundName, IsGrounded());
 
-        _anim.SetBool(_isMovName, _xAxis != 0 || _zAxis != 0);
+        _anim.SetBool(_isMovName, _dir.x != 0 || _dir.z != 0);
 
         if (Input.GetKeyDown(_atkKey))
         {
@@ -114,9 +121,9 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if((_xAxis != 0.0f || _zAxis != 0.0f) && !IsBlocked(_xAxis, _zAxis))
+        if((_dir.x != 0.0f || _dir.z != 0.0f) && !IsBlocked(_dir.x, _dir.z))
         {
-            Movement(_xAxis, _zAxis);
+            Movement(_dir);
         }
     }
 
@@ -131,7 +138,20 @@ public class Player : MonoBehaviour
                 enemy.TakeDamage(_atkDmg);
             }
         }
-    }    
+    }
+
+    public void Cast()
+    {
+        Collider[] colliders = Physics.OverlapSphere(transform.position, _castRadius);
+
+        foreach (Collider col in colliders)
+        {
+            if (col.TryGetComponent<Enemy>(out Enemy enemy))
+            {
+                enemy.TakeDamage(_atkDmg * 3);
+            }
+        }
+    }
 
     private void Interact()
     {
@@ -151,11 +171,19 @@ public class Player : MonoBehaviour
         _rb.AddForce(transform.up * _jumpForce, ForceMode.Impulse);
     }
 
-    private void Movement(float x, float z)
+    private void Movement(Vector3 dir)
     {
-        _dir = (transform.right * x + transform.forward * z).normalized;
+        _camForwardFix = _camTransform.forward;
+        _camRightFix = _camTransform.right;
 
-        _rb.MovePosition(transform.position + _dir * _movSpeed * Time.fixedDeltaTime);
+        _camForwardFix.y = 0.0f;
+        _camRightFix.y = 0.0f;
+
+        Rotate(_camForwardFix);
+
+        _dirFix = (_camRightFix * dir.x + _camForwardFix * dir.z);
+
+        _rb.MovePosition(transform.position + _dirFix * _movSpeed * Time.fixedDeltaTime);
     }
 
     public void MultiAttack()
@@ -171,19 +199,11 @@ public class Player : MonoBehaviour
                 enemy.TakeDamage(_atkDmg * 2);
             }
         }
-    }
-
-    public void Cast()
+    }   
+    
+    private void Rotate(Vector3 dir)
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, _castRadius);
-
-        foreach (Collider col in colliders)
-        {
-            if(col.TryGetComponent<Enemy>(out Enemy enemy))
-            {
-                enemy.TakeDamage(_atkDmg * 3);
-            }
-        }
+        transform.forward = dir;
     }
 
     private bool IsGrounded()
