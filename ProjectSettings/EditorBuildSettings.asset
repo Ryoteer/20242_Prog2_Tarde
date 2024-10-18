@@ -8,4 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LevelOne.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/ExteriorScene.unity
+    guid: a70af51e3499a7a4e808310561e0ef59
+  - enabled: 1
+    path: Assets/Scenes/CaveScene.unity
+    guid: f346a85e50052f942abb010b45f16758
   m_configObjects: {}
