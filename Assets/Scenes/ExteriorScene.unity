@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 249375549}
   - component: {fileID: 249375548}
   - component: {fileID: 249375547}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Cave Loader
   m_TagString: Untagged
   m_Icon: {fileID: 0}

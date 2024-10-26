@@ -117,6 +117,11 @@ public class Player : MonoBehaviour
             _anim.SetTrigger(_jumpName);
             Jump();
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneLoadManager.Instance.LoadSecenAsync("MainMenu");
+        }
     }
 
     private void FixedUpdate()

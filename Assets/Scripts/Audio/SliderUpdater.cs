@@ -10,19 +10,45 @@ public class SliderUpdater : MonoBehaviour
     [Range(0.0f, 1.0f)][SerializeField] private float _musicValue = 0.375f;
     [Range(0.0f, 1.0f)][SerializeField] private float _sfxValue = 0.75f;
 
-    [Header("color=orange>UI</color>")]
+    [Header("<color=orange>UI</color>")]
     [SerializeField] private Slider _masterSlider;
     [SerializeField] private Slider _musicSlider;
     [SerializeField] private Slider _sfxSlider;
 
-    private void Start()
+    private void Awake()
     {
-        _masterSlider.value = _masterValue;
-        AudioManager.Instance.SetMasterVolume(_masterValue);
-        _musicSlider.value = _musicValue;
-        AudioManager.Instance.SetMusicVolume(_musicValue);
-        _sfxSlider.value = _sfxValue;
-        AudioManager.Instance.SetSFXVolume(_sfxValue);
+        if(AudioManager.Instance.MasterVolume != 0.0f)
+        {
+            _masterSlider.value = AudioManager.Instance.MasterVolume;
+            AudioManager.Instance.SetMasterVolume(AudioManager.Instance.MasterVolume);
+        }
+        else
+        {
+            _masterSlider.value = _masterValue;
+            AudioManager.Instance.SetMasterVolume(_masterValue);
+        }
+
+        if (AudioManager.Instance.MusicVolume != 0.0f)
+        {
+            _musicSlider.value = AudioManager.Instance.MusicVolume;
+            AudioManager.Instance.SetMusicVolume(AudioManager.Instance.MusicVolume);
+        }
+        else
+        {
+            _musicSlider.value = _musicValue;
+            AudioManager.Instance.SetMusicVolume(_musicValue);
+        }
+
+        if (AudioManager.Instance.SfxVolume != 0.0f)
+        {
+            _sfxSlider.value = AudioManager.Instance.SfxVolume;
+            AudioManager.Instance.SetSFXVolume(AudioManager.Instance.SfxVolume);
+        }
+        else
+        {
+            _sfxSlider.value = _sfxValue;
+            AudioManager.Instance.SetSFXVolume(_sfxValue);
+        }
     }
 
     public void SetMasterVolume(float value)
