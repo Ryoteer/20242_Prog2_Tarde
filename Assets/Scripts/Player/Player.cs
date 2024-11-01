@@ -29,6 +29,7 @@ public class Player : MonoBehaviour
     [SerializeField] private KeyCode _castKey = KeyCode.Mouse2;
     [SerializeField] private KeyCode _intKey = KeyCode.F;
     [SerializeField] private KeyCode _jumpKey = KeyCode.Space;
+    [SerializeField] private KeyCode _quitKey = KeyCode.P;
 
     [Header("<color=#6A89A7>Physics</color>")]
     [SerializeField] private Transform _atkOrigin;
@@ -45,6 +46,9 @@ public class Player : MonoBehaviour
     [SerializeField] private float _movRayDist = 0.75f;
     [SerializeField] private LayerMask _movMask;
     [SerializeField] private float _movSpeed = 3.5f;
+
+    [Header("<color=#6A89A7>VFX</color>")]
+    [SerializeField] private ParticleSystem _psystem;
 
     private Vector3 _camForwardFix = new(), _camRightFix = new(), _dir = new(), _jumpOffset = new(), _movRayDir = new();
     private Vector3 _dirFix = new();
@@ -118,7 +122,7 @@ public class Player : MonoBehaviour
             Jump();
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(_quitKey))
         {
             SceneLoadManager.Instance.LoadSecenAsync("MainMenu");
         }
@@ -148,6 +152,7 @@ public class Player : MonoBehaviour
     public void Cast()
     {
         Collider[] colliders = Physics.OverlapSphere(transform.position, _castRadius);
+        _psystem.Play();
 
         foreach (Collider col in colliders)
         {
